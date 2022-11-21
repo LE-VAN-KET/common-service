@@ -17,7 +17,6 @@ public class WebUtil {
 
     @Autowired
     private HttpServletRequest httpServletRequest;
-
     public String getRequestId() {
         return Optional.ofNullable(httpServletRequest)
                 .map(req -> String.valueOf(req.getAttribute(CommonConstant.HttpAttribute.REQUEST_ID)))

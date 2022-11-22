@@ -8,10 +8,6 @@ pipeline{
         }
     }
 
-    triggers {
-        pollSCM('*/15 * * * *')
-    }
-
     environment {
          // This can be nexus3 or nexus2
         NEXUS_VERSION = "nexus3"

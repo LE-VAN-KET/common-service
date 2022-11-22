@@ -77,17 +77,18 @@ pipeline{
                     sh "mvn clean verify sonar:sonar -Dsonar.projectKey=common-service"
                 }
 
-                timeout(time: 5, unit: 'MINUTES') { // pipeline will be killed after a timeout
-                    def sonar = waitForQualityGate()
-                    if (sonar.status != 'OK') {
-                        if (sonar.status == 'WARN') {
-                            currentBuild.result = 'UNSTABLE'
-                        } else {
-                            error "Quality gate is broken"
-                        }
+                timeout(time: 1, unit: 'HOURS') { // pipeline will be killed after a timeout
+                    script {
+                         def sonar = waitForQualityGate()
+                         if (sonar.status != 'OK') {
+                             if (sonar.status == 'WARN') {
+                                 currentBuild.result = 'UNSTABLE'
+                             } else {
+                                 error "Quality gate is broken"
+                             }
+                         }
                     }
                 }
-                
             }
         }
 

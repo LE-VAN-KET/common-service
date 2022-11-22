@@ -1,3 +1,23 @@
+
+def uploadJarToNexus(artifactPath, pom) {
+    nexusArtifactUploader(
+        nexusVersion: NEXUS_VERSION,
+        protocol: NEXUS_PROTOCOL,
+        nexusUrl: NEXUS_URL,
+        groupId: "${pom.groupId}",
+        version: "${pom.version}",
+        repository: NEXUS_REPOSITORY,
+        credentialsId: NEXUS_CREDENTIAL_ID,
+        artifacts: [
+            // Artifact generated such as .jar, .ear and .war files.
+            [artifactId: pom.artifactId,
+            classifier: '',
+            file: artifactPath,
+            type: pom.packaging]
+        ]
+    )
+}
+
 pipeline{
     agent {
         docker {
@@ -5,7 +25,6 @@ pipeline{
             args '-v /root/.m2:/root/.m2'
         }
     }
-
     environment {
          // This can be nexus3 or nexus2
         NEXUS_VERSION = "nexus3"
@@ -18,15 +37,24 @@ pipeline{
         // Jenkins credential id to authenticate to Nexus OSS
         NEXUS_CREDENTIAL_ID = "nexus-user-credentials"
     }
-
     stages{
-        stage('Prepare workspace') {
-            steps {
-                echo 'Prepare workspace'
-                // Clean workspace
-                step([$class: 'WsCleanup'])
-                // Checkout git
-                checkout scm
+        stage("A"){
+            stage('Prepare workspace') {
+                steps {
+                    echo 'Prepare workspace'
+                    // Clean workspace
+                    step([$class: 'WsCleanup'])
+                    // Checkout git
+                    checkout scm
+                }
+            }
+            post{
+                success{
+                    echo "========Prepare workspace successfully========"
+                }
+                failure{
+                    echo "========Prepare workspace failed========"
+                }
             }
         }
 
@@ -54,26 +82,22 @@ pipeline{
         }
 
         stage('SonarQube Analysis') {
-            agent {
-                docker {
-                    image 'maven:3-alpine'
-                    args '-v /root/.m2:/root/.m2'
-                }
-            }
             steps {
                 withSonarQubeEnv() {
                     sh "mvn clean verify sonar:sonar -Dsonar.projectKey=common-service"
                 }
 
                 timeout(time: 5, unit: 'MINUTES') { // pipeline will be killed after a timeout
-                def sonarStatus = waitForQualityGate().status
-                if (sonarStatus != 'OK') {
-                    if (sonarStatus == 'WARN') {
-                        currentBuild.result = 'UNSTABLE'
-                    } else {
-                        error "Quality gate is broken"
+                    def sonarStatus = waitForQualityGate().status
+                    if (sonarStatus != 'OK') {
+                        if (sonarStatus == 'WARN') {
+                            currentBuild.result = 'UNSTABLE'
+                        } else {
+                            error "Quality gate is broken"
+                        }
                     }
                 }
+                
             }
         }
 
@@ -104,35 +128,18 @@ pipeline{
                 }
             }
         }
+
+
     }
     post{
         always{
             echo "========always========"
         }
         success{
-             echo "========pipeline executed successfully ========"
+            echo "========pipeline executed successfully ========"
         }
         failure{
             echo "========pipeline execution failed========"
         }
     }
-}
-
-def uploadJarToNexus(artifactPath, pom) {
-    nexusArtifactUploader(
-        nexusVersion: NEXUS_VERSION,
-        protocol: NEXUS_PROTOCOL,
-        nexusUrl: NEXUS_URL,
-        groupId: "${pom.groupId}",
-        version: "${pom.version}",
-        repository: NEXUS_REPOSITORY,
-        credentialsId: NEXUS_CREDENTIAL_ID,
-        artifacts: [
-            // Artifact generated such as .jar, .ear and .war files.
-            [artifactId: pom.artifactId,
-            classifier: '',
-            file: artifactPath,
-            type: pom.packaging]
-        ]
-    )
 }

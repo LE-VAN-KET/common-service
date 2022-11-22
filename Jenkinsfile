@@ -26,7 +26,6 @@ pipeline{
         }
     }
     environment {
-         // This can be nexus3 or nexus2
         NEXUS_VERSION = "nexus3"
         // This can be http or https
         NEXUS_PROTOCOL = "http"

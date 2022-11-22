@@ -72,7 +72,7 @@ pipeline{
 
         stage('SonarQube Analysis') {
             agent {
-                docker { image 'openjdk:11' }
+                docker { image 'eclipse-temurin:11' }
             }
             steps {
                 withSonarQubeEnv('SonarQube') {

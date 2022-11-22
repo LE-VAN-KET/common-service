@@ -58,6 +58,13 @@ pipeline{
         }
 
         stage('Testing') {
+            tools {
+                    jdk "jdk11"
+            }
+            environment {
+                jdk = tool name: 'jdk11'
+                javahome = "${jdk}/jdk-11.0.1"
+            }
             steps {
                 echo 'Test stage'
                 script {

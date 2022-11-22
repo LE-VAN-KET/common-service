@@ -77,7 +77,8 @@ pipeline{
                     sh "mvn -s settings.xml clean verify sonar:sonar -Dsonar.projectKey=common-service"
                 }
 
-                timeout(time: 1, unit: 'HOURS') { // pipeline will be killed after a timeout
+                // pipeline will be killed after a timeout
+                timeout(time: 1, unit: 'HOURS') {
                     script {
                          def sonar = waitForQualityGate()
                          if (sonar.status != 'OK') {

@@ -71,13 +71,6 @@ pipeline{
         }
 
         stage('SonarQube Analysis') {
-            tools {
-                    jdk "jdk11"
-            }
-            environment {
-                jdk = tool name: 'jdk11'
-                javahome = "${jdk}/jdk-11.0.1"
-            }
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh "mvn -s settings.xml clean verify sonar:sonar -Dsonar.projectKey=common-service"

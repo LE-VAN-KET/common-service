@@ -1,4 +1,22 @@
-#!/usr/bin/env groovy
+
+def uploadJarToNexus(artifactPath, pom) {
+    nexusArtifactUploader(
+        nexusVersion: NEXUS_VERSION,
+        protocol: NEXUS_PROTOCOL,
+        nexusUrl: NEXUS_URL,
+        groupId: "${pom.groupId}",
+        version: "${pom.version}",
+        repository: NEXUS_REPOSITORY,
+        credentialsId: NEXUS_CREDENTIAL_ID,
+        artifacts: [
+            // Artifact generated such as .jar, .ear and .war files.
+            [artifactId: pom.artifactId,
+            classifier: '',
+            file: artifactPath,
+            type: pom.packaging]
+        ]
+    )
+}
 
 pipeline{
     agent {
@@ -7,13 +25,7 @@ pipeline{
             args '-v /root/.m2:/root/.m2'
         }
     }
-
-    triggers {
-        pollSCM('*/15 * * * *')
-    }
-
     environment {
-         // This can be nexus3 or nexus2
         NEXUS_VERSION = "nexus3"
         // This can be http or https
         NEXUS_PROTOCOL = "http"
@@ -24,7 +36,6 @@ pipeline{
         // Jenkins credential id to authenticate to Nexus OSS
         NEXUS_CREDENTIAL_ID = "nexus-user-credentials"
     }
-
     stages{
         stage('Prepare workspace') {
             steps {
@@ -41,17 +52,24 @@ pipeline{
                 echo 'Dependency stage'
                 script {
                     sh "echo 'Downloading dependencies...'"
-                    sh "mvn clean install -DskipTests=true"
+                    sh "mvn -s settings.xml clean install -DskipTests=true"
                 }
             }
         }
 
         stage('Testing') {
+            tools {
+                    jdk "jdk11"
+            }
+            environment {
+                jdk = tool name: 'jdk11'
+                javahome = "${jdk}/jdk-11.0.1"
+            }
             steps {
                 echo 'Test stage'
                 script {
                     sh "echo 'JUnit testing...'"
-                    sh "mvn test"
+                    sh "mvn test -s settings.xml"
 //                     sh "echo 'Integration testing...'"
 //                     sh "mvn test -Dtest=IntegrationTest"
                     jacoco(execPattern: 'target/jacoco.exec')
@@ -60,21 +78,18 @@ pipeline{
         }
 
         stage('SonarQube Analysis') {
-            agent {
-                docker {
-                    image 'maven:3-alpine'
-                    args '-v /root/.m2:/root/.m2'
+            steps {
+                withSonarQubeEnv('My SonarQube Server') {
+                    sh "mvn -s settings.xml clean verify sonar:sonar -Dsonar.projectKey=common-service"
                 }
             }
-            steps {
-                withSonarQubeEnv() {
-                    sh "mvn clean verify sonar:sonar -Dsonar.projectKey=common-service"
-                }
+        }
 
-                timeout(time: 5, unit: 'MINUTES') { // pipeline will be killed after a timeout
-                def sonarStatus = waitForQualityGate().status
-                if (sonarStatus != 'OK') {
-                    if (sonarStatus == 'WARN') {
+        stage("Quality Gate") {
+            timeout(time: 1, unit: 'HOURS') {
+                def sonar = waitForQualityGate()
+                if (sonar.status != 'OK') {
+                    if (sonar.status == 'WARN') {
                         currentBuild.result = 'UNSTABLE'
                     } else {
                         error "Quality gate is broken"
@@ -110,35 +125,18 @@ pipeline{
                 }
             }
         }
+
+
     }
     post{
         always{
             echo "========always========"
         }
         success{
-             echo "========pipeline executed successfully ========"
+            echo "========pipeline executed successfully ========"
         }
         failure{
             echo "========pipeline execution failed========"
         }
     }
-}
-
-def uploadJarToNexus(artifactPath, pom) {
-    nexusArtifactUploader(
-        nexusVersion: NEXUS_VERSION,
-        protocol: NEXUS_PROTOCOL,
-        nexusUrl: NEXUS_URL,
-        groupId: "${pom.groupId}",
-        version: "${pom.version}",
-        repository: NEXUS_REPOSITORY,
-        credentialsId: NEXUS_CREDENTIAL_ID,
-        artifacts: [
-            // Artifact generated such as .jar, .ear and .war files.
-            [artifactId: pom.artifactId,
-            classifier: '',
-            file: artifactPath,
-            type: pom.packaging]
-        ]
-    )
 }

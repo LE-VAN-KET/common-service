@@ -72,18 +72,22 @@ pipeline{
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('sonarqube') {
+                withSonarQubeEnv('My SonarQube Server') {
                     sh "mvn -s settings.xml clean verify sonar:sonar -Dsonar.projectKey=common-service"
                 }
+            }
+        }
 
+        stage("Quality Gate") {
+            timeout(time: 1, unit: 'HOURS') {
                 def sonar = waitForQualityGate()
-                 if (sonar.status != 'OK') {
-                     if (sonar.status == 'WARN') {
-                         currentBuild.result = 'UNSTABLE'
-                     } else {
-                         error "Quality gate is broken"
-                     }
-                 }
+                if (sonar.status != 'OK') {
+                    if (sonar.status == 'WARN') {
+                        currentBuild.result = 'UNSTABLE'
+                    } else {
+                        error "Quality gate is broken"
+                    }
+                }
             }
         }
 

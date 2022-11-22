@@ -71,8 +71,8 @@ pipeline{
         }
 
         stage('SonarQube Analysis') {
-            tools {
-                jdk "jdk11"
+            agent {
+                docker { image 'openjdk:11' }
             }
             steps {
                 withSonarQubeEnv('SonarQube') {

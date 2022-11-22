@@ -47,14 +47,6 @@ pipeline{
                 checkout scm
             }
         }
-        post{
-            success{
-                echo "========Prepare workspace successfully========"
-            }
-            failure{
-                echo "========Prepare workspace failed========"
-            }
-        }
 
         stage('Dependencies'){
             steps {

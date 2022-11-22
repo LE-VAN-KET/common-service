@@ -58,13 +58,6 @@ pipeline{
         }
 
         stage('Testing') {
-            tools {
-                    jdk "jdk11"
-            }
-            environment {
-                jdk = tool name: 'jdk11'
-                javahome = "${jdk}/jdk-11.0.1"
-            }
             steps {
                 echo 'Test stage'
                 script {
@@ -78,21 +71,26 @@ pipeline{
         }
 
         stage('SonarQube Analysis') {
+            tools {
+                    jdk "jdk11"
+            }
+            environment {
+                jdk = tool name: 'jdk11'
+                javahome = "${jdk}/jdk-11.0.1"
+            }
             steps {
                 withSonarQubeEnv('My SonarQube Server') {
                     sh "mvn -s settings.xml clean verify sonar:sonar -Dsonar.projectKey=common-service"
                 }
-            }
-        }
 
-        stage("Quality Gate") {
-            timeout(time: 1, unit: 'HOURS') {
-                def sonar = waitForQualityGate()
-                if (sonar.status != 'OK') {
-                    if (sonar.status == 'WARN') {
-                        currentBuild.result = 'UNSTABLE'
-                    } else {
-                        error "Quality gate is broken"
+                script {
+                    def sonar = waitForQualityGate()
+                    if (sonar.status != 'OK') {
+                        if (sonar.status == 'WARN') {
+                            currentBuild.result = 'UNSTABLE'
+                        } else {
+                            error "Quality gate is broken"
+                        }
                     }
                 }
             }

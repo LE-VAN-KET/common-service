@@ -20,9 +20,8 @@ def uploadJarToNexus(artifactPath, pom) {
 
 pipeline{
     agent {
-        docker {
-            image 'maven:3-alpine'
-            args '-v /root/.m2:/root/.m2'
+        node {
+            label 'maven'
         }
     }
     environment {
@@ -63,7 +62,7 @@ pipeline{
                 echo 'Test stage'
                 script {
                     sh "echo 'JUnit testing...'"
-                    sh "mvn -s settings.xml test"
+                    sh "mvn test"
 //                     sh "echo 'Integration testing...'"
 //                     sh "mvn test -Dtest=IntegrationTest"
                     jacoco(execPattern: 'target/jacoco.exec')
@@ -74,7 +73,7 @@ pipeline{
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh "mvn -s settings.xml clean verify sonar:sonar -Dsonar.projectKey=common-service"
+                    sh "mvn clean verify sonar:sonar -Dsonar.projectKey=common-service"
                 }
 
                 timeout(time: 1, unit: 'HOURS') { // pipeline will be killed after a timeout

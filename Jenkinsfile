@@ -38,23 +38,21 @@ pipeline{
         NEXUS_CREDENTIAL_ID = "nexus-user-credentials"
     }
     stages{
-        stage("A"){
-            stage('Prepare workspace') {
-                steps {
-                    echo 'Prepare workspace'
-                    // Clean workspace
-                    step([$class: 'WsCleanup'])
-                    // Checkout git
-                    checkout scm
-                }
+        stage('Prepare workspace') {
+            steps {
+                echo 'Prepare workspace'
+                // Clean workspace
+                step([$class: 'WsCleanup'])
+                // Checkout git
+                checkout scm
             }
-            post{
-                success{
-                    echo "========Prepare workspace successfully========"
-                }
-                failure{
-                    echo "========Prepare workspace failed========"
-                }
+        }
+        post{
+            success{
+                echo "========Prepare workspace successfully========"
+            }
+            failure{
+                echo "========Prepare workspace failed========"
             }
         }
 
@@ -88,9 +86,9 @@ pipeline{
                 }
 
                 timeout(time: 5, unit: 'MINUTES') { // pipeline will be killed after a timeout
-                    def sonarStatus = waitForQualityGate().status
-                    if (sonarStatus != 'OK') {
-                        if (sonarStatus == 'WARN') {
+                    def sonar = waitForQualityGate()
+                    if (sonar.status != 'OK') {
+                        if (sonar.status == 'WARN') {
                             currentBuild.result = 'UNSTABLE'
                         } else {
                             error "Quality gate is broken"

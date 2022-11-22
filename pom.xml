@@ -61,6 +61,11 @@
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>${springdoc-openapi-ui.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+        </dependency>
     </dependencies>
 
     <artifactId>common</artifactId>
@@ -81,7 +86,9 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <release>8</release>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <verbose>true</verbose>
                 </configuration>
             </plugin>
 
@@ -145,6 +152,8 @@
             </activation>
             <properties>
                 <sonar.host.url>http://146.190.105.184:10000</sonar.host.url>
+                <sonar.login>admin</sonar.login>
+                <sonar.password>1234Qwer</sonar.password>
             </properties>
         </profile>
     </profiles>

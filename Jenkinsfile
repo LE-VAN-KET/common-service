@@ -52,8 +52,8 @@ pipeline{
                 step([$class: 'WsCleanup'])
                 // Checkout git
                 checkout([$class: 'GitSCM',
-                    branches: [[name: "origin/${BRANCH_PATTERN}"]],
-                    extensions: [[$class: 'LocalBranch']])
+                    branches: [[name: "origin/${BRANCH_PATTERN}"]]
+                    ])
             }
         }
 

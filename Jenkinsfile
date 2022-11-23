@@ -12,7 +12,12 @@ def uploadJarToNexus(artifactPath, pom) {
             [artifactId: pom.artifactId,
             classifier: '',
             file: artifactPath,
-            type: 'jar']
+            type: 'jar'],
+
+            [artifactId: pom.artifactId,
+            classifier: '',
+            file: "pom.xml",
+            type: "pom"]
         ]
     )
 }

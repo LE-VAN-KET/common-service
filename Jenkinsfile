@@ -31,6 +31,13 @@ pipeline{
         // Jenkins credential id to authenticate to Nexus OSS
         NEXUS_CREDENTIAL_ID = "nexus-user-credentials"
     }
+
+    parameters {
+        string (
+            defaultValue: '*',
+            description: '',
+            name : 'BRANCH_PATTERN')
+    }
     stages{
         stage('Prepare workspace') {
             agent {
@@ -44,7 +51,9 @@ pipeline{
                 // Clean workspace
                 step([$class: 'WsCleanup'])
                 // Checkout git
-                checkout scm
+                checkout([$class: 'GitSCM',
+                    branches: [[name: "origin/${BRANCH_PATTERN}"]],
+                    extensions: [[$class: 'LocalBranch']])
             }
         }
 
@@ -119,10 +128,6 @@ pipeline{
 
         stage("Deliver for development"){
             when {
-//                 allOf {
-//                     branch "develop"
-//                     branch "origin/develop"
-//                 }
                 expression {
                     GIT_BRANCH = 'origin/' + sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
                     return GIT_BRANCH == 'origin/develop'
@@ -158,12 +163,29 @@ pipeline{
         }
         aborted {
             echo "Sending message to Slack"
+            slackSend (color: "${env.SLACK_COLOR_WARNING}",
+                        channel: "#jenkins-notification",
+                        message: "${custom_msg_notification('ABORTED')}")
         }
         success{
-            echo "========pipeline executed successfully ========"
+            echo "Sending message to Slack"
+            slackSend (color: "${env.SLACK_COLOR_GOOD}",
+                     channel: "#jenkins-notification",
+                     message: "${custom_msg_notification('SUCCESS')}")
         }
         failure{
-            echo "========pipeline execution failed========"
+            echo "Sending message to Slack"
+            slackSend (color: "${env.SLACK_COLOR_DANGER}",
+                     channel: "#jenkins-notification",
+                     message: "${custom_msg_notification('FAILED')}")
         }
     }
+}
+
+def custom_msg_notification(MSG_TYPE) {
+    def JOB_NAME = env.JOB_NAME
+    def BUILD_NUMBER = env.BUILD_NUMBER
+    def USER_ID = env.USER_ID
+    def JENKINS_LOG= " ${MSG_TYPE}: Job [${JOB_NAME}] build ${BUILD_NUMBER} by ${USER_ID} \n More info at ${env.BUILD_URL}"
+    return JENKINS_LOG
 }

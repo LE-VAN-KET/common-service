@@ -19,12 +19,8 @@ def uploadJarToNexus(artifactPath, pom) {
 }
 
 pipeline{
-    agent {
-        docker {
-            image 'maven:3-alpine'
-            args '-v /root/.m2:/root/.m2'
-        }
-    }
+    agent any
+
     environment {
         NEXUS_VERSION = "nexus3"
         // This can be http or https
@@ -38,6 +34,12 @@ pipeline{
     }
     stages{
         stage('Prepare workspace') {
+            agent {
+                docker {
+                    image 'maven:3-alpine'
+                    args '-v /root/.m2:/root/.m2'
+                }
+            }
             steps {
                 echo 'Prepare workspace'
                 // Clean workspace
@@ -48,6 +50,12 @@ pipeline{
         }
 
         stage('Dependencies'){
+            agent {
+                docker {
+                    image 'maven:3-alpine'
+                    args '-v /root/.m2:/root/.m2'
+                }
+            }
             steps {
                 echo 'Dependency stage'
                 script {
@@ -58,6 +66,12 @@ pipeline{
         }
 
         stage('Testing') {
+            agent {
+                docker {
+                    image 'maven:3-alpine'
+                    args '-v /root/.m2:/root/.m2'
+                }
+            }
             steps {
                 echo 'Test stage'
                 script {
@@ -71,8 +85,11 @@ pipeline{
         }
 
         stage('SonarQube Analysis') {
-            tools {
-                jdk 'openjdk-11.0.17_8'
+            agent {
+                docker {
+                    image 'jenkins/jnlp-agent-maven:jdk11'
+                    args '-v /root/.m2:/root/.m2'
+                }
             }
             steps {
                 withMaven(maven: 'maven3', jdk: 'openjdk-11.0.17_8') {

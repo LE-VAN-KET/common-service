@@ -12,7 +12,7 @@ def uploadJarToNexus(artifactPath, pom) {
             [artifactId: pom.artifactId,
             classifier: '',
             file: artifactPath,
-            type: pom.packaging]
+            type: 'jar']
         ]
     )
 }
@@ -27,7 +27,7 @@ pipeline{
         // Where your Nexus is running. 'nexus-3' is defined in the docker-compose file
         NEXUS_URL = "146.190.104.63:8081"
         // Repository where we will upload the artifact
-        NEXUS_REPOSITORY = "maven-group"
+        NEXUS_REPOSITORY = "maven-releases"
         // Jenkins credential id to authenticate to Nexus OSS
         NEXUS_CREDENTIAL_ID = "nexus-user-credentials"
     }

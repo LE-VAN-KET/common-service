@@ -45,8 +45,10 @@ pipeline{
                 // Clean workspace
                 step([$class: 'WsCleanup'])
                 // Checkout git
-                def commit = checkout scm
-                env.BRANCH_NAME = commit.GIT_BRANCH.replace('origin/', '')
+                script {
+                    def commit = checkout scm
+                    env.BRANCH_NAME = commit.GIT_BRANCH.replace('origin/', '')
+                }
             }
         }
 

@@ -32,12 +32,6 @@ pipeline{
         NEXUS_CREDENTIAL_ID = "nexus-user-credentials"
     }
 
-    parameters {
-        string (
-            defaultValue: '*',
-            description: '',
-            name : 'BRANCH_PATTERN')
-    }
     stages{
         stage('Prepare workspace') {
             agent {
@@ -51,9 +45,11 @@ pipeline{
                 // Clean workspace
                 step([$class: 'WsCleanup'])
                 // Checkout git
-                checkout([$class: 'GitSCM',
-                    branches: [[name: "origin/${BRANCH_PATTERN}"]]
-                    ])
+                checkout scm
+                script {
+                    GIT_BRANCH = sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
+                    echo "${GIT_BRANCH}"
+                }
             }
         }
 

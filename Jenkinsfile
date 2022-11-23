@@ -72,7 +72,7 @@ pipeline{
 
         stage('SonarQube Analysis') {
             tools {
-                jdk 'oracle-7u80'
+                jdk 'openjdk-11.0.17'
             }
             steps {
                 withSonarQubeEnv('SonarQube') {

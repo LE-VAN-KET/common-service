@@ -76,6 +76,11 @@ pipeline{
             }
             steps {
                 withSonarQubeEnv('SonarQube') {
+                    sh """
+                        env | grep -e PATH -e JAVA_HOME
+                        which java
+                        java --version
+                    """
                     sh "mvn -s settings.xml clean verify sonar:sonar -Dsonar.projectKey=common-service"
                 }
 

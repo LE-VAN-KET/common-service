@@ -46,10 +46,6 @@ pipeline{
                 step([$class: 'WsCleanup'])
                 // Checkout git
                 checkout scm
-                script {
-                    GIT_BRANCH = sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
-                    echo "${GIT_BRANCH}"
-                }
             }
         }
 
@@ -125,8 +121,7 @@ pipeline{
         stage("Deliver for development"){
             when {
                 expression {
-                    GIT_BRANCH = 'origin/' + sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
-                    return GIT_BRANCH == 'origin/develop'
+                    return (env.BRANCH_NAME == 'origin/develop' | env.BRANCH_NAME == 'develop')
                 }
             }
             steps{

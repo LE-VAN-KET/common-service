@@ -119,9 +119,13 @@ pipeline{
 
         stage("Deliver for development"){
             when {
-                allOf {
-                    branch "develop"
-                    branch "origin/develop"
+//                 allOf {
+//                     branch "develop"
+//                     branch "origin/develop"
+//                 }
+                expression {
+                    GIT_BRANCH = 'origin/' + sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
+                    return GIT_BRANCH == 'origin/develop'
                 }
             }
             steps{
@@ -151,6 +155,9 @@ pipeline{
     post{
         always{
             echo "========always========"
+        }
+        aborted {
+            echo "Sending message to Slack"
         }
         success{
             echo "========pipeline executed successfully ========"

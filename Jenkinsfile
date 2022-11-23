@@ -96,7 +96,7 @@ pipeline{
             }
             steps {
                 withSonarQubeEnv(installationName: 'SonarQube') {
-                    sh """mvn clean verify sonar:sonar -Dsonar.projectKey=common-service \
+                    sh """mvn -s settings.xml clean verify sonar:sonar -Dsonar.projectKey=common-service \
                     -Dsonar.host.url=http://146.190.105.184:10000 -Dsonar.login=sqa_13efc056525ae8add04170822913d63831329f84
                     """
                 }

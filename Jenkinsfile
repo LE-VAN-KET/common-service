@@ -1,4 +1,3 @@
-
 def uploadJarToNexus(artifactPath, pom) {
     nexusArtifactUploader(
         nexusVersion: NEXUS_VERSION,
@@ -145,8 +144,6 @@ pipeline{
                 }
             }
         }
-
-
     }
     post{
         always{

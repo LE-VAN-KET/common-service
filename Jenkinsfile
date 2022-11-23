@@ -92,10 +92,8 @@ pipeline{
                 }
             }
             steps {
-                withMaven(maven: 'maven3', jdk: 'openjdk-11.0.17_8') {
-                    withSonarQubeEnv('SonarQube') {
-                        sh "mvn -s settings.xml clean verify sonar:sonar -Dsonar.projectKey=common-service"
-                    }
+                withSonarQubeEnv('SonarQube') {
+                    sh "mvn -s settings.xml clean verify sonar:sonar -Dsonar.projectKey=common-service"
                 }
 
                 script {

@@ -136,26 +136,26 @@
             </plugin>
 
             <!--  plugins for sonarqube  -->
-            <plugin>
-                <groupId>org.sonarsource.scanner.maven</groupId>
-                <artifactId>sonar-maven-plugin</artifactId>
-                <version>3.9.1.2184</version>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.sonarsource.scanner.maven</groupId>-->
+<!--                <artifactId>sonar-maven-plugin</artifactId>-->
+<!--                <version>3.9.1.2184</version>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>sonar</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <sonar.host.url>http://146.190.105.184:10000</sonar.host.url>
-                <sonar.login>admin</sonar.login>
-                <sonar.password>1234Qwer</sonar.password>
-            </properties>
-        </profile>
-    </profiles>
+<!--    <profiles>-->
+<!--        <profile>-->
+<!--            <id>sonar</id>-->
+<!--            <activation>-->
+<!--                <activeByDefault>true</activeByDefault>-->
+<!--            </activation>-->
+<!--            <properties>-->
+<!--                <sonar.host.url>http://146.190.105.184:10000</sonar.host.url>-->
+<!--                <sonar.login>admin</sonar.login>-->
+<!--                <sonar.password>1234Qwer</sonar.password>-->
+<!--            </properties>-->
+<!--        </profile>-->
+<!--    </profiles>-->
 
 </project>

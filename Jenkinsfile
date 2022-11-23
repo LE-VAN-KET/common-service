@@ -1,4 +1,3 @@
-
 def uploadJarToNexus(artifactPath, pom) {
     nexusArtifactUploader(
         nexusVersion: NEXUS_VERSION,
@@ -19,12 +18,8 @@ def uploadJarToNexus(artifactPath, pom) {
 }
 
 pipeline{
-    agent {
-        docker {
-            image 'maven:3-alpine'
-            args '-v /root/.m2:/root/.m2'
-        }
-    }
+    agent any
+
     environment {
         NEXUS_VERSION = "nexus3"
         // This can be http or https
@@ -38,6 +33,12 @@ pipeline{
     }
     stages{
         stage('Prepare workspace') {
+            agent {
+                docker {
+                    image 'maven:3-alpine'
+                    args '-v /root/.m2:/root/.m2'
+                }
+            }
             steps {
                 echo 'Prepare workspace'
                 // Clean workspace
@@ -48,6 +49,12 @@ pipeline{
         }
 
         stage('Dependencies'){
+            agent {
+                docker {
+                    image 'maven:3-alpine'
+                    args '-v /root/.m2:/root/.m2'
+                }
+            }
             steps {
                 echo 'Dependency stage'
                 script {
@@ -58,12 +65,11 @@ pipeline{
         }
 
         stage('Testing') {
-            tools {
-                    jdk "jdk11"
-            }
-            environment {
-                jdk = tool name: 'jdk11'
-                javahome = "${jdk}/jdk-11.0.1"
+            agent {
+                docker {
+                    image 'maven:3-alpine'
+                    args '-v /root/.m2:/root/.m2'
+                }
             }
             steps {
                 echo 'Test stage'
@@ -78,21 +84,34 @@ pipeline{
         }
 
         stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh "mvn -s settings.xml clean verify sonar:sonar -Dsonar.projectKey=common-service"
+            agent {
+                docker {
+                    image 'jenkins/jnlp-agent-maven:jdk11'
+                    args '-v /root/.m2:/root/.m2'
                 }
             }
-        }
+            environment {
+                scannerHome = tool 'SonarQube'
+            }
+            steps {
+                withSonarQubeEnv(installationName: 'SonarQube') {
+                    sh """mvn -s settings.xml clean verify sonar:sonar -Dsonar.projectKey=common-service \
+                    -Dsonar.host.url=http://146.190.105.184:10000 -Dsonar.login=sqa_13efc056525ae8add04170822913d63831329f84
+                    """
+                }
 
-        stage("Quality Gate") {
-            timeout(time: 1, unit: 'HOURS') {
-                def sonar = waitForQualityGate()
-                if (sonar.status != 'OK') {
-                    if (sonar.status == 'WARN') {
-                        currentBuild.result = 'UNSTABLE'
-                    } else {
-                        error "Quality gate is broken"
+                timeout(time: 60, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+
+                script {
+                    def sonar = waitForQualityGate()
+                    if (sonar.status != 'OK') {
+                        if (sonar.status == 'WARN') {
+                            currentBuild.result = 'UNSTABLE'
+                        } else {
+                            error "Quality gate is broken"
+                        }
                     }
                 }
             }
@@ -125,8 +144,6 @@ pipeline{
                 }
             }
         }
-
-
     }
     post{
         always{

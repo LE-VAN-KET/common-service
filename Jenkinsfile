@@ -127,6 +127,12 @@ pipeline{
                     return (env.BRANCH_NAME == 'origin/develop' | env.BRANCH_NAME == 'develop')
                 }
             }
+            agent {
+                docker {
+                    image 'maven:3-alpine'
+                    args '-v /root/.m2:/root/.m2'
+                }
+            }
             steps{
                 echo "========Push artifact to nexus========"
                 script {

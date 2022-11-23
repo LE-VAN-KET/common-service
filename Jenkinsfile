@@ -119,7 +119,10 @@ pipeline{
 
         stage("Deliver for development"){
             when {
-                branch "*/develop"
+                allOf {
+                    branch "develop"
+                    branch "origin/develop"
+                }
             }
             steps{
                 echo "========Push artifact to nexus========"

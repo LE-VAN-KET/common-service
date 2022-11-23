@@ -74,10 +74,6 @@ pipeline{
             tools {
                 jdk 'openjdk-11.0.17_8'
             }
-            environment {
-                jdk = tool name: 'openjdk-11.0.17_8'
-                JAVA_HOME = "${jdk}/jdk-11.0.17"
-            }
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh """

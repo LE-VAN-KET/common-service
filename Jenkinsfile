@@ -71,8 +71,8 @@ pipeline{
         }
 
         stage('SonarQube Analysis') {
-            agent {
-                docker { image 'eclipse-temurin:11' }
+            tools {
+                jdk 'oracle-7u80'
             }
             steps {
                 withSonarQubeEnv('SonarQube') {

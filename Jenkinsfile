@@ -19,6 +19,12 @@ def uploadJarToNexus(artifactPath, pom) {
 }
 
 pipeline{
+    agent {
+        docker {
+            image 'maven:3-alpine'
+            args '-v /root/.m2:/root/.m2'
+        }
+    }
     environment {
         NEXUS_VERSION = "nexus3"
         // This can be http or https
@@ -42,12 +48,6 @@ pipeline{
         }
 
         stage('Dependencies'){
-            agent {
-                docker {
-                    image 'maven:3-alpine'
-                    args '-v /root/.m2:/root/.m2'
-                }
-            }
             steps {
                 echo 'Dependency stage'
                 script {
@@ -58,12 +58,6 @@ pipeline{
         }
 
         stage('Testing') {
-            agent {
-                docker {
-                    image 'maven:3-alpine'
-                    args '-v /root/.m2:/root/.m2'
-                }
-            }
             steps {
                 echo 'Test stage'
                 script {
@@ -77,18 +71,14 @@ pipeline{
         }
 
         stage('SonarQube Analysis') {
-            agent {
-                docker {
-                    image 'maven:3-jdk-11'
-                    args '-v /root/.m2:/root/.m2'
-                }
-            }
             tools {
                 jdk 'openjdk-11.0.17_8'
             }
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh "mvn -s settings.xml clean verify sonar:sonar -Dsonar.projectKey=common-service"
+                withMaven(maven: 'maven3', jdk: 'openjdk-11.0.17_8') {
+                    withSonarQubeEnv('SonarQube') {
+                        sh "mvn -s settings.xml clean verify sonar:sonar -Dsonar.projectKey=common-service"
+                    }
                 }
 
                 script {

@@ -127,6 +127,12 @@ pipeline{
         }
 
         stage("Deliver for development"){
+            agent {
+                docker {
+                    image 'maven:3-alpine'
+                    args '-v /root/.m2:/root/.m2'
+                }
+            }
             when {
                 expression {
                     return (env.BRANCH_NAME == 'origin/develop' | env.BRANCH_NAME == 'develop')
@@ -135,6 +141,7 @@ pipeline{
             steps{
                 echo "========Push artifact to nexus========"
                 script {
+                    sh "mvn -s settings.xml clean install -DskipTests=true"
                     // Read POM xml file
                     pom = readMavenPom file: "pom.xml";
                     // Find built artifact under target folder

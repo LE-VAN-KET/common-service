@@ -140,6 +140,8 @@ pipeline{
                     // Find built artifact under target folder
                     filesByGlob = findFiles(glob: "target/*.jar");
 
+                    echo "${filesByGlob}"
+
                     // Extract the path from the File found
                     artifactPath = filesByGlob[0].path;
 

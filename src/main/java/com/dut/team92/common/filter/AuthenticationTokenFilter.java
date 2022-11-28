@@ -1,15 +1,11 @@
 package com.dut.team92.common.filter;
 
-import com.dut.team92.common.constant.CommonConstant;
 import com.dut.team92.common.exception.InvalidTokenHeader;
-import com.dut.team92.common.exception.handler.CommonExceptionHandler;
 import com.dut.team92.common.exception.model.CommonErrorResponse;
 import com.dut.team92.common.security.TokenProvider;
-import com.dut.team92.common.util.WebUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +18,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import static net.logstash.logback.argument.StructuredArguments.v;
 

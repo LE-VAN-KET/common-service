@@ -138,7 +138,7 @@ pipeline{
                     // Read POM xml file
                     pom = readMavenPom file: "pom.xml";
                     // Find built artifact under target folder
-                    filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
+                    filesByGlob = findFiles(glob: "target/*.jar");
 
                     // Extract the path from the File found
                     artifactPath = filesByGlob[0].path;

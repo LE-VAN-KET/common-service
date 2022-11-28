@@ -138,7 +138,7 @@ pipeline{
                     // Read POM xml file
                     pom = readMavenPom file: "pom.xml";
                     // Find built artifact under target folder
-                    filesByGlob = findFiles(glob: "target/*.jar");
+                    filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
 
                     echo "${filesByGlob}"
 

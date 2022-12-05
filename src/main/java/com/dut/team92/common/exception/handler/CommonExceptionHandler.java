@@ -25,6 +25,7 @@ import java.util.Optional;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.joining;
 import static net.logstash.logback.argument.StructuredArguments.v;
+import io.sentry.Sentry;
 
 @RestControllerAdvice
 public class CommonExceptionHandler {
@@ -88,6 +89,7 @@ public class CommonExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     protected CommonErrorResponse handleServerErrorException(Exception ex, String exceptionType) {
         addErrorLog(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), exceptionType);
+        Sentry.captureException(ex);
         return new CommonErrorResponse(
                 webUtil.getRequestId(),
                 HttpStatus.INTERNAL_SERVER_ERROR,
@@ -136,6 +138,7 @@ public class CommonExceptionHandler {
     public CommonErrorResponse handleAll(Exception ex) {
         addErrorLog(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
         String errMsg = "Unexpected internal server error occurs";
+        Sentry.captureException(ex);
         return new CommonErrorResponse(
                 webUtil.getRequestId(),
                 HttpStatus.INTERNAL_SERVER_ERROR,

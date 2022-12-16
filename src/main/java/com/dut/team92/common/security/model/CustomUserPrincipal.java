@@ -23,11 +23,12 @@ public class CustomUserPrincipal extends User {
         this.organizationId = organizationId;
     }
 
-    public CustomUserPrincipal(String username, String password, String subId, String fullName, boolean enabled,
+    public CustomUserPrincipal(String organizationId, String username, String password, String subId, String fullName, boolean enabled,
                                Collection<? extends GrantedAuthority> authorities) {
         super(username, password, enabled, true, true, true, authorities);
         this.fullName = fullName;
         this.subId = subId;
+        this.organizationId = organizationId;
     }
 
     public CustomUserPrincipal(String username, String subId, String fullName, boolean enabled,

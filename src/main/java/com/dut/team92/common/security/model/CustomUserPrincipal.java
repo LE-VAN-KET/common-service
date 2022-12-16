@@ -53,5 +53,7 @@ public class CustomUserPrincipal extends User {
         return subId;
     }
 
-
+    public String getOrganizationId() {
+        return organizationId;
+    }
 }

@@ -121,7 +121,8 @@ public class TokenProvider {
         String tokenType = claims.get(TokenKey.TOKEN_TYPE, String.class);
         String fullName = claims.get(TokenKey.FULL_NAME, String.class);
         String subId = claims.get(TokenKey.SUB_ID, String.class);
-        return new CustomUserPrincipal(subject, subId, fullName, tokenType, auth, authorities);
+        String organizationId = claims.get(TokenKey.ORGANIZATION_ID, String.class);
+        return new CustomUserPrincipal(organizationId, subject, subId, fullName, tokenType, auth, authorities);
     }
 
     /**

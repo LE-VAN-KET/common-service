@@ -5,4 +5,5 @@ public interface TokenKey {
     String TOKEN_TYPE = "token_type";
     String FULL_NAME = "full_name";
     String SUB_ID = "sub_id";
+    String ORGANIZATION_ID = "organization_id";
 }

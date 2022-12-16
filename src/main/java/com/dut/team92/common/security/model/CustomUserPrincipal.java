@@ -11,14 +11,16 @@ public class CustomUserPrincipal extends User {
     private String auth;
     private String tokenType;
     private final String fullName;
+    private String organizationId;
 
-    public CustomUserPrincipal(String username, String subId, String fullName, String tokenType, String auth,
+    public CustomUserPrincipal(String organizationId, String username, String subId, String fullName, String tokenType, String auth,
                                Collection<? extends GrantedAuthority> authorities) {
         super(username, "", true, true, true, true, authorities);
         this.fullName = fullName;
         this.tokenType = tokenType;
         this.auth = auth;
         this.subId = subId;
+        this.organizationId = organizationId;
     }
 
     public CustomUserPrincipal(String username, String password, String subId, String fullName, boolean enabled,
@@ -50,4 +52,6 @@ public class CustomUserPrincipal extends User {
     public String getSubId() {
         return subId;
     }
+
+
 }
